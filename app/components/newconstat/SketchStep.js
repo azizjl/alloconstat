@@ -246,8 +246,6 @@ export default function SketchStep() {
       description: caseItem.description,
       responsibility: caseItem.responsibility
     });
-    setShowTemplateModal(false);
-    setShowTemplates(false);
   };
   
   // Render the grid programmatically
@@ -342,16 +340,26 @@ export default function SketchStep() {
               {category.cases.map((caseItem) => (
                 <TouchableOpacity
                   key={caseItem.id}
-                  style={tw`w-1/3 p-1`}
+                  style={tw`w-1/2 p-1`}
                   onPress={() => selectTemplate(category, caseItem)}
                 >
-                  <View style={tw`border border-gray-300 rounded-lg p-2 items-center`}>
+                  <View style={[
+                    tw`border rounded-lg p-2 items-center`,
+                    selectedTemplate && selectedTemplate.caseId === caseItem.id 
+                      ? tw`border-[#0a7ea4] border-2` 
+                      : tw`border-gray-300`
+                  ]}>
                     <Image
                       source={caseImages[caseItem.id]}
-                      style={tw`w-full h-20 mb-1`}
+                      style={tw`w-full h-28 mb-1`}
                       resizeMode="contain"
                     />
-                    <Text style={tw`text-xs text-center font-[OutfitM]`}>
+                    <Text style={[
+                      tw`text-xs text-center font-[OutfitM]`,
+                      selectedTemplate && selectedTemplate.caseId === caseItem.id 
+                        ? tw`text-[#0a7ea4] font-[OutfitB]` 
+                        : null
+                    ]}>
                       Cas {caseItem.id}
                     </Text>
                   </View>
@@ -456,6 +464,14 @@ export default function SketchStep() {
               <View style={tw`flex-row items-center mb-2`}>
                 <Text style={tw`font-[OutfitB] text-gray-800`}>Cas sélectionné: </Text>
                 <Text style={tw`text-gray-700`}>Cas {selectedTemplate.caseId}</Text>
+              </View>
+              
+              <View style={tw`items-center mb-2`}>
+                <Image
+                  source={caseImages[selectedTemplate.caseId]}
+                  style={tw`w-full h-32`}
+                  resizeMode="contain"
+                />
               </View>
               
               <Text style={tw`text-gray-700 mb-2`}>{selectedTemplate.description}</Text>

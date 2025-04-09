@@ -44,7 +44,7 @@ export default function ReviewStep() {
   };
   
   return (
-    <View style={tw`bg-white rounded-lg p-6 shadow-sm`}>
+    <ScrollView style={tw`bg-white rounded-lg p-6 shadow-sm`}>
       <Text style={tw`text-xl font-[OutfitB] mb-6 text-center`}>
         Récapitulatif du constat
       </Text>
@@ -236,6 +236,6 @@ export default function ReviewStep() {
       <Text style={tw`text-gray-500 text-center mt-4 font-[OutfitR]`}>
         Vérifiez toutes les informations avant de soumettre le constat.
       </Text>
-    </View>
+    </ScrollView>
   );
 } 
