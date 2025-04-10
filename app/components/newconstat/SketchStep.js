@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert, Dimensions, Image, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
@@ -201,6 +201,9 @@ export default function SketchStep() {
           constatState.setSketchTemplate(selectedTemplate);
         }
         
+        // Save the paths to allow for future editing
+        constatState.setSketchPaths(paths);
+        
         Alert.alert("Succès", "Croquis enregistré avec succès");
       }
     } catch (error) {
@@ -208,6 +211,61 @@ export default function SketchStep() {
       Alert.alert("Erreur", "Impossible d'enregistrer le croquis");
     }
   };
+  
+  // Improve the auto-save function to ensure data is saved when navigating
+  useEffect(() => {
+    const autoSave = async () => {
+      if (viewShotRef.current) {
+        try {
+          const uri = await viewShotRef.current.capture();
+          const base64 = await FileSystem.readAsStringAsync(uri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          
+          constatState.setSketchImage({ uri, base64 });
+          
+          if (selectedTemplate) {
+            constatState.setSketchTemplate(selectedTemplate);
+          }
+          
+          constatState.setSketchPaths(paths);
+          console.log("Auto-saved sketch data");
+        } catch (error) {
+          console.error("Error in auto-save:", error);
+        }
+      }
+    };
+
+    // Auto-save whenever paths or selectedTemplate changes
+    autoSave();
+    
+    // Also auto-save when component unmounts
+    return () => {
+      autoSave();
+    };
+  }, [paths, selectedTemplate]);
+  
+  // Load saved data when component mounts
+  useEffect(() => {
+    console.log("Loading saved sketch data...");
+    
+    if (constatState.sketchPaths && constatState.sketchPaths.length > 0) {
+      console.log("Setting paths from store:", constatState.sketchPaths.length, "paths");
+      setPaths(constatState.sketchPaths);
+    }
+    
+    if (constatState.sketchTemplate) {
+      console.log("Setting template from store:", constatState.sketchTemplate.caseId);
+      setSelectedTemplate(constatState.sketchTemplate);
+      // If we have a template, we should show the drawing view instead of template selection
+      setShowTemplates(false);
+    } else {
+      // If we have paths but no template, we should still show the drawing view
+      if (constatState.sketchPaths && constatState.sketchPaths.length > 0) {
+        setShowTemplates(false);
+      }
+    }
+  }, []);
 
   const caseImages = {
     1: require('../../../assets/images/croquis/1.png'),
@@ -240,12 +298,30 @@ export default function SketchStep() {
   
   // Select a template
   const selectTemplate = (category, caseItem) => {
-    setSelectedTemplate({
+    // Create the template data
+    const templateData = {
       category: category.title,
       caseId: caseItem.id,
       description: caseItem.description,
       responsibility: caseItem.responsibility
-    });
+    };
+    
+    // Update local state
+    setSelectedTemplate(templateData);
+    
+    // Clear any existing sketch data
+    setPaths([]);
+    setCurrentPoints([]);
+    
+    // Save the template to the constatStore and clear any existing sketch image
+    constatState.setSketchImage(null);
+    constatState.setSketchTemplate(templateData);
+    constatState.setSketchPaths([]);
+    
+    console.log("Template saved to store:", templateData);
+    
+    // Show template modal when a template is selected
+    setShowTemplateModal(true);
   };
   
   // Render the grid programmatically
@@ -306,7 +382,7 @@ export default function SketchStep() {
   
   const FieldBubble = ({ number }) => (
     <View style={tw`h-6 w-6 rounded-full bg-gray-700 items-center justify-center mr-2`}>
-      <Text style={tw`text-white font-[OutfitB] text-xs`}>{number}</Text>
+      <Text style={[tw`text-white font-[OutfitB] text-xs`,{fontFamily:'OutfitB'}]}>{number}</Text>
     </View>
   );
   
@@ -314,23 +390,23 @@ export default function SketchStep() {
   const renderTemplateSelection = () => {
     return (
       <View style={tw`mb-6`}>
-        <Text style={tw`text-lg font-[OutfitB] text-gray-800 mb-4`}>
+        <Text style={[tw`text-lg font-[OutfitB] text-gray-800 mb-4`,{fontFamily:'OutfitB'}]}>
           Sélectionnez un cas type d'accident
         </Text>
         
-        <Text style={tw`text-gray-600 mb-4`}>
+        <Text style={[tw`text-gray-600 mb-4`,{fontFamily:'OutfitB'}]}>
           Choisissez parmi les cas types ci-dessous ou dessinez votre propre croquis.
         </Text>
         
         {/* Template categories */}
         {accidentScenarios.map((category, index) => (
           <View key={index} style={tw`mb-6`}>
-            <Text style={tw`text-base font-[OutfitB] text-[#0a7ea4] mb-2`}>
+            <Text style={[tw`text-base font-[OutfitB] text-[#0a7ea4] mb-2`,{fontFamily:'OutfitB'}]}>
               {category.title}
             </Text>
             
             {category.subtitle && (
-              <Text style={tw`text-sm font-[OutfitM] text-gray-600 mb-2 italic`}>
+              <Text style={[tw`text-sm font-[OutfitM] text-gray-600 mb-2 italic`,{fontFamily:'OutfitB'}]}>
                 {category.subtitle}
               </Text>
             )}
@@ -374,7 +450,7 @@ export default function SketchStep() {
           onPress={() => setShowTemplates(false)}
         >
           <Ionicons name="pencil" size={20} color="white" style={tw`mr-2`} />
-          <Text style={tw`text-white font-[OutfitM]`}>Dessiner mon propre croquis</Text>
+          <Text style={[tw`text-white font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Dessiner mon propre croquis</Text>
         </TouchableOpacity>
       </View>
     );
@@ -382,6 +458,8 @@ export default function SketchStep() {
   
   // Render the template details modal
   const renderTemplateModal = () => {
+    if (!selectedTemplate) return null;
+    
     return (
       <Modal
         visible={showTemplateModal}
@@ -391,25 +469,25 @@ export default function SketchStep() {
       >
         <View style={tw`flex-1 bg-black bg-opacity-50 justify-center items-center p-4`}>
           <View style={tw`bg-white rounded-lg p-4 w-full max-w-md`}>
-            <Text style={tw`text-lg font-[OutfitB] mb-2`}>Détails du cas</Text>
+            <Text style={[tw`text-lg font-[OutfitB] mb-2`,{fontFamily:'OutfitB'}]}>Détails du cas</Text>
             
             {selectedTemplate && (
               <>
                 <Image
-                  source={{ uri: `asset:/images/croquis/${selectedTemplate.caseId}.png` }}
+                  source={caseImages[selectedTemplate.caseId]}
                   style={tw`w-full h-40 mb-4`}
                   resizeMode="contain"
                 />
                 
-                <Text style={tw`font-[OutfitM] mb-1`}>
+                <Text style={[tw`font-[OutfitM] mb-1`,{fontFamily:'OutfitB'}]}>
                   Cas {selectedTemplate.caseId}
                 </Text>
                 
-                <Text style={tw`text-gray-700 mb-2`}>
+                <Text style={[tw`text-gray-700 mb-2`,{fontFamily:'OutfitB'}]}>
                   {selectedTemplate.description}
                 </Text>
                 
-                <Text style={tw`font-[OutfitB] mb-4`}>
+                <Text style={[tw`font-[OutfitB] mb-4`,{fontFamily:'OutfitB'}]}>
                   Responsabilité: {selectedTemplate.responsibility}
                 </Text>
                 
@@ -418,7 +496,7 @@ export default function SketchStep() {
                     style={tw`bg-gray-200 py-2 px-4 rounded-lg mr-2`}
                     onPress={() => setShowTemplateModal(false)}
                   >
-                    <Text style={tw`text-gray-700`}>Fermer</Text>
+                    <Text style={[tw`text-gray-700`,{fontFamily:'OutfitB'}]}>Fermer</Text>
                   </TouchableOpacity>
                   
                   <TouchableOpacity
@@ -428,7 +506,7 @@ export default function SketchStep() {
                       setShowTemplates(false);
                     }}
                   >
-                    <Text style={tw`text-white`}>Sélectionner</Text>
+                    <Text style={[tw`text-white`,{fontFamily:'OutfitB'}]}>Sélectionner</Text>
                   </TouchableOpacity>
                 </View>
               </>
@@ -446,7 +524,7 @@ export default function SketchStep() {
       contentContainerStyle={tw`p-6`}
       scrollEnabled={!isDrawing}
     >
-      <Text style={tw`text-xl font-[OutfitB] mb-6 text-center`}>
+      <Text style={[tw`text-xl font-[OutfitB] mb-6 text-center`,{fontFamily:'OutfitB'}]}>
         Croquis de l'accident
       </Text>
       
@@ -456,14 +534,14 @@ export default function SketchStep() {
         <View style={tw`mb-6`}>
           <View style={tw`flex-row items-center mb-2`}>
             <FieldBubble number="13" />
-            <Text style={tw`text-lg font-[OutfitB] text-gray-800`}>Croquis de l'accident</Text>
+            <Text style={[tw`text-lg font-[OutfitB] text-gray-800`,{fontFamily:'OutfitB'}]}>Croquis de l'accident</Text>
           </View>
           
           {selectedTemplate ? (
             <View style={tw`mb-4 p-3 bg-gray-100 rounded-lg`}>
               <View style={tw`flex-row items-center mb-2`}>
-                <Text style={tw`font-[OutfitB] text-gray-800`}>Cas sélectionné: </Text>
-                <Text style={tw`text-gray-700`}>Cas {selectedTemplate.caseId}</Text>
+                <Text style={[tw`font-[OutfitB] text-gray-800`,{fontFamily:'OutfitB'}]}>Cas sélectionné: </Text>
+                <Text style={[tw`text-gray-700`,{fontFamily:'OutfitB'}]}>Cas {selectedTemplate.caseId}</Text>
               </View>
               
               <View style={tw`items-center mb-2`}>
@@ -474,22 +552,22 @@ export default function SketchStep() {
                 />
               </View>
               
-              <Text style={tw`text-gray-700 mb-2`}>{selectedTemplate.description}</Text>
+              <Text style={[tw`text-gray-700 mb-2`,{fontFamily:'OutfitB'}]}>{selectedTemplate.description}</Text>
               
               <View style={tw`flex-row justify-between`}>
-                <Text style={tw`text-gray-700`}>Responsabilité: {selectedTemplate.responsibility}</Text>
+                <Text style={[tw`text-gray-700`,{fontFamily:'OutfitB'}]}>Responsabilité: {selectedTemplate.responsibility}</Text>
                 
                 <TouchableOpacity
                   onPress={() => setShowTemplates(true)}
                   style={tw`flex-row items-center`}
                 >
-                  <Text style={tw`text-[#0a7ea4] mr-1`}>Changer</Text>
+                  <Text style={[tw`text-[#0a7ea4] mr-1`,{fontFamily:'OutfitB'}]}>Changer</Text>
                   <Ionicons name="refresh" size={16} color="#0a7ea4" />
                 </TouchableOpacity>
               </View>
             </View>
           ) : (
-            <Text style={tw`text-gray-500 mb-4 font-[OutfitR]`}>
+            <Text style={[tw`text-gray-500 mb-4 font-[OutfitR]`,{fontFamily:'OutfitB'}]}>
               Dessinez un croquis de l'accident en indiquant la position des véhicules, 
               la direction, les panneaux de signalisation, etc.
             </Text>
@@ -536,7 +614,7 @@ export default function SketchStep() {
           
           {/* Drawing tools */}
           <View style={tw`mt-4`}>
-            <Text style={tw`text-gray-700 font-[OutfitM] mb-2`}>Outils de dessin:</Text>
+            <Text style={[tw`text-gray-700 font-[OutfitM] mb-2`,{fontFamily:'OutfitB'}]}>Outils de dessin:</Text>
             
             {/* Color selection */}
             <View style={tw`flex-row mb-3`}>
@@ -553,7 +631,7 @@ export default function SketchStep() {
                       currentColor === item.color ? tw`border-2 border-gray-500` : null
                     ]}
                   />
-                  <Text style={tw`text-xs text-gray-600`}>{item.name}</Text>
+                  <Text style={[tw`text-xs text-gray-600`,{fontFamily:'OutfitB'}]   }>{item.name}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -573,7 +651,7 @@ export default function SketchStep() {
                       strokeWidth === item.width ? tw`bg-[#0a7ea4]` : null
                     ]}
                   />
-                  <Text style={tw`text-xs text-gray-600`}>{item.name}</Text>
+                  <Text style={[tw`text-xs text-gray-600`,{fontFamily:'OutfitB'}]}>{item.name}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -590,7 +668,7 @@ export default function SketchStep() {
                   color="#0a7ea4" 
                   style={tw`mr-1`} 
                 />
-                <Text style={tw`text-[#0a7ea4] font-[OutfitM] text-sm`}>
+                <Text style={[tw`text-[#0a7ea4] font-[OutfitM] text-sm`,{fontFamily:'OutfitB'}]}>
                   {showGrid ? "Masquer grille" : "Afficher grille"}
                 </Text>
               </TouchableOpacity>
@@ -600,7 +678,7 @@ export default function SketchStep() {
                 onPress={clearCanvas}
               >
                 <Ionicons name="trash-outline" size={18} color="red" style={tw`mr-1`} />
-                <Text style={tw`text-red-500 font-[OutfitM] text-sm`}>Effacer tout</Text>
+                <Text style={[tw`text-red-500 font-[OutfitM] text-sm`,{fontFamily:'OutfitB'}]}>Effacer tout</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -611,18 +689,18 @@ export default function SketchStep() {
         <>
           {/* Notes section */}
           <View style={tw`mb-6`}>
-            <Text style={tw`text-gray-700 font-[OutfitM] mb-2`}>Légende / Notes:</Text>
+            <Text style={[tw`text-gray-700 font-[OutfitM] mb-2`,{fontFamily:'OutfitB'}]}>Légende / Notes:</Text>
             <View style={tw`flex-row items-center mb-2`}>
               <View style={tw`w-6 h-6 bg-red-500 rounded-full mr-2`} />
-              <Text style={tw`text-gray-700`}>Véhicule A</Text>
+              <Text style={[tw`text-gray-700`,{fontFamily:'OutfitB'}]}>Véhicule A</Text>
             </View>
             <View style={tw`flex-row items-center mb-2`}>
               <View style={tw`w-6 h-6 bg-blue-500 rounded-full mr-2`} />
-              <Text style={tw`text-gray-700`}>Véhicule B</Text>
+              <Text style={[tw`text-gray-700`,{fontFamily:'OutfitB'}]}>Véhicule B</Text>
             </View>
             <View style={tw`flex-row items-center mb-4`}>
               <Ionicons name="arrow-forward" size={24} color="black" style={tw`mr-2`} />
-              <Text style={tw`text-gray-700`}>Direction</Text>
+              <Text style={[tw`text-gray-700`,{fontFamily:'OutfitB'}]}>Direction</Text>
             </View>
           </View>
           
@@ -632,7 +710,7 @@ export default function SketchStep() {
             onPress={saveSketch}
           >
             <Ionicons name="save-outline" size={20} color="white" style={tw`mr-2`} />
-            <Text style={tw`text-white font-[OutfitM]`}>Enregistrer le croquis</Text>
+            <Text style={[tw`text-white font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Enregistrer le croquis</Text>
           </TouchableOpacity>
           
           {/* Return to templates button */}
@@ -641,7 +719,7 @@ export default function SketchStep() {
             onPress={() => setShowTemplates(true)}
           >
             <Ionicons name="grid-outline" size={20} color="#555" style={tw`mr-2`} />
-            <Text style={tw`text-gray-700 font-[OutfitM]`}>Voir les cas types</Text>
+            <Text style={[tw`text-gray-700 font-[OutfitM]`,{fontFamily:'OutfitB'}]  }>Voir les cas types</Text>
           </TouchableOpacity>
         </>
       )}

@@ -83,6 +83,14 @@ export default function VehicleInfoStep({ isVehicleA }) {
   const [showToDatePicker, setShowToDatePicker] = useState(false);
   const [showLicenseDatePicker, setShowLicenseDatePicker] = useState(false);
   
+  // Add validation state
+  const [showValidation, setShowValidation] = useState(false);
+  
+  // Helper function to determine border color based on validation
+  const getBorderColor = (value) => {
+    return value ? 'border-gray-300' : 'border-red-500';
+  };
+  
   const handleFromDateChange = (event, selectedDate) => {
     setShowFromDatePicker(false);
     if (selectedDate) {
@@ -114,8 +122,8 @@ export default function VehicleInfoStep({ isVehicleA }) {
       return;
     }
     
-    if (vehicleImages && vehicleImages.length >= 6) {
-      alert('Vous avez atteint le nombre maximum de photos (6)');
+    if (vehicleImages && vehicleImages.length >= 8) {
+      alert('Vous avez atteint le nombre maximum de photos (8)');
       return;
     }
     
@@ -141,8 +149,8 @@ export default function VehicleInfoStep({ isVehicleA }) {
       return;
     }
     
-    if (vehicleImages && vehicleImages.length >= 6) {
-      alert('Vous avez atteint le nombre maximum de photos (6)');
+    if (vehicleImages && vehicleImages.length >= 8) {
+      alert('Vous avez atteint le nombre maximum de photos (8)');
       return;
     }
     
@@ -168,13 +176,13 @@ export default function VehicleInfoStep({ isVehicleA }) {
   
   const FieldBubble = ({ number }) => (
     <View style={tw`h-6 w-6 rounded-full bg-gray-700 items-center justify-center mr-2`}>
-      <Text style={tw`text-white font-[OutfitB] text-xs`}>{number}</Text>
+      <Text style={[tw`text-white font-[OutfitB] text-xs`,{fontFamily:'OutfitB'}]}>{number}</Text>
     </View>
   );
   
   return (
     <ScrollView style={tw`bg-white rounded-lg p-6 shadow-sm`} showsVerticalScrollIndicator={false}>
-      <Text style={tw`text-xl font-[OutfitB] mb-6 text-center`}>
+      <Text style={[tw`text-xl font-[OutfitB] mb-6 text-center`,{fontFamily:'OutfitB'}]}>
         Informations sur le Véhicule {isVehicleA ? 'A' : 'B'}
       </Text>
       
@@ -182,13 +190,13 @@ export default function VehicleInfoStep({ isVehicleA }) {
       <View style={tw`mb-6 border-b border-gray-200 pb-4`}>
         <View style={tw`flex-row items-center mb-2`}>
           <FieldBubble number="6" />
-          <Text style={tw`text-lg font-[OutfitB] text-gray-800`}>Société d'Assurances</Text>
+          <Text style={[tw`text-lg font-[OutfitB] text-gray-800`,{fontFamily:'OutfitB'}]}>Société d'Assurances</Text>
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Véhicule assuré par</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Véhicule assuré par</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(vehicleInsurance)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Nom de la compagnie d'assurance"
             value={vehicleInsurance}
             onChangeText={setVehicleInsurance}
@@ -196,9 +204,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Police d'Assurance N°</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Police d'Assurance N°</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(vehicleInsurancePolicy)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Numéro de police d'assurance"
             value={vehicleInsurancePolicy}
             onChangeText={setVehicleInsurancePolicy}
@@ -206,9 +214,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Agence</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Agence</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(vehicleAgency)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Agence d'assurance"
             value={vehicleAgency}
             onChangeText={setVehicleAgency}
@@ -216,12 +224,12 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Attestation valable du</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Attestation valable du</Text>
           <TouchableOpacity 
-            style={tw`border border-gray-300 rounded-lg p-3 flex-row justify-between items-center`}
+            style={tw`border ${getBorderColor(vehicleCertificateValidFrom)} rounded-lg p-3 flex-row justify-between items-center`}
             onPress={() => setShowFromDatePicker(true)}
           >
-            <Text style={tw`font-[OutfitR] ${vehicleCertificateValidFrom ? 'text-black' : 'text-gray-400'}`}>
+            <Text style={[tw`font-[OutfitR] ${vehicleCertificateValidFrom ? 'text-black' : 'text-gray-400'}`,{fontFamily:'OutfitB'}]}>
               {vehicleCertificateValidFrom || 'Sélectionner une date'}
             </Text>
             <Ionicons name="calendar-outline" size={20} color="#0a7ea4" />
@@ -237,12 +245,12 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>au</Text>
+            <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>au</Text>
           <TouchableOpacity 
-            style={tw`border border-gray-300 rounded-lg p-3 flex-row justify-between items-center`}
+            style={tw`border ${getBorderColor(vehicleCertificateValidTo)} rounded-lg p-3 flex-row justify-between items-center`}
             onPress={() => setShowToDatePicker(true)}
           >
-            <Text style={tw`font-[OutfitR] ${vehicleCertificateValidTo ? 'text-black' : 'text-gray-400'}`}>
+            <Text style={[tw`font-[OutfitR] ${vehicleCertificateValidTo ? 'text-black' : 'text-gray-400'}`,{fontFamily:'OutfitB'}]  }>
               {vehicleCertificateValidTo || 'Sélectionner une date'}
             </Text>
             <Ionicons name="calendar-outline" size={20} color="#0a7ea4" />
@@ -262,13 +270,13 @@ export default function VehicleInfoStep({ isVehicleA }) {
       <View style={tw`mb-6 border-b border-gray-200 pb-4`}>
         <View style={tw`flex-row items-center mb-2`}>
           <FieldBubble number="7" />
-          <Text style={tw`text-lg font-[OutfitB] text-gray-800`}>Identité du Conducteur</Text>
+            <Text style={[tw`text-lg font-[OutfitB] text-gray-800`,{fontFamily:'OutfitB'}]}>Identité du Conducteur</Text>
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Nom</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Nom</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(driverName)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Nom du conducteur"
             value={driverName}
             onChangeText={setDriverName}
@@ -276,9 +284,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Prénom</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Prénom</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(driverFirstName)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Prénom du conducteur"
             value={driverFirstName}
             onChangeText={setDriverFirstName}
@@ -286,9 +294,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Adresse</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Adresse</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(driverAddress)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Adresse du conducteur"
             value={driverAddress}
             onChangeText={setDriverAddress}
@@ -296,9 +304,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Téléphone</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Téléphone</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(driverPhone)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Téléphone du conducteur"
             value={driverPhone}
             onChangeText={setDriverPhone}
@@ -307,9 +315,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Permis de conduire N°</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Permis de conduire N°</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(driverLicense)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Numéro de permis"
             value={driverLicense}
             onChangeText={setDriverLicense}
@@ -317,12 +325,12 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Délivré le</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Délivré le</Text>
           <TouchableOpacity 
-            style={tw`border border-gray-300 rounded-lg p-3 flex-row justify-between items-center`}
+            style={tw`border ${getBorderColor(driverLicenseDate)} rounded-lg p-3 flex-row justify-between items-center`}
             onPress={() => setShowLicenseDatePicker(true)}
           >
-            <Text style={tw`font-[OutfitR] ${driverLicenseDate ? 'text-black' : 'text-gray-400'}`}>
+            <Text style={[tw`font-[OutfitR] ${driverLicenseDate ? 'text-black' : 'text-gray-400'}`,{fontFamily:'OutfitB'}]}>
               {driverLicenseDate || 'Sélectionner une date'}
             </Text>
             <Ionicons name="calendar-outline" size={20} color="#0a7ea4" />
@@ -342,13 +350,13 @@ export default function VehicleInfoStep({ isVehicleA }) {
       <View style={tw`mb-6 border-b border-gray-200 pb-4`}>
         <View style={tw`flex-row items-center mb-2`}>
           <FieldBubble number="8" />
-          <Text style={tw`text-lg font-[OutfitB] text-gray-800`}>Assuré (voir attest. d'assur.)</Text>
+          <Text style={[tw`text-lg font-[OutfitB] text-gray-800`,{fontFamily:'OutfitB'}]}>Assuré (voir attest. d'assur.)</Text>
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Nom</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]   }>Nom</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(insuredName)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Nom de l'assuré"
             value={insuredName}
             onChangeText={setInsuredName}
@@ -356,9 +364,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Prénom</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Prénom</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(insuredFirstName)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Prénom de l'assuré"
             value={insuredFirstName}
             onChangeText={setInsuredFirstName}
@@ -366,9 +374,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Adresse</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Adresse</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(insuredAddress)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Adresse de l'assuré"
             value={insuredAddress}
             onChangeText={setInsuredAddress}
@@ -376,9 +384,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Tél</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Tél</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(insuredPhone)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Téléphone de l'assuré"
             value={insuredPhone}
             onChangeText={setInsuredPhone}
@@ -391,20 +399,20 @@ export default function VehicleInfoStep({ isVehicleA }) {
       <View style={tw`mb-6 border-b border-gray-200 pb-4`}>
         <View style={tw`flex-row items-center mb-2`}>
           <FieldBubble number="9" />
-          <Text style={tw`text-lg font-[OutfitB] text-gray-800`}>Identité du Véhicule</Text>
+          <Text style={[tw`text-lg font-[OutfitB] text-gray-800`,{fontFamily:'OutfitB'}]}>Identité du Véhicule</Text>
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Marque, Type</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Marque, Type</Text>
           <View style={tw`flex-row`}>
             <TextInput
-              style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR] flex-1 mr-2`}
+              style={tw`border ${getBorderColor(vehicleMake)} rounded-lg p-3 font-[OutfitR] flex-1 mr-2`}
               placeholder="Marque"
               value={vehicleMake}
               onChangeText={setVehicleMake}
             />
             <TextInput
-              style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR] flex-1`}
+              style={tw`border ${getBorderColor(vehicleModel)} rounded-lg p-3 font-[OutfitR] flex-1`}
               placeholder="Modèle"
               value={vehicleModel}
               onChangeText={setVehicleModel}
@@ -413,9 +421,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>N° d'immatriculation</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>N° d'immatriculation</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(vehiclePlate)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Ex: 1234 TU 123"
             value={vehiclePlate}
             onChangeText={setVehiclePlate}
@@ -423,9 +431,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Sens suivi</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Sens suivi</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(vehicleDirection)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Direction du véhicule"
             value={vehicleDirection}
             onChangeText={setVehicleDirection}
@@ -433,9 +441,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Venant de</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Venant de</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(vehicleFrom)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Lieu de provenance"
             value={vehicleFrom}
             onChangeText={setVehicleFrom}
@@ -443,9 +451,9 @@ export default function VehicleInfoStep({ isVehicleA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Allant à</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Allant à</Text>
           <TextInput
-            style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
+            style={tw`border ${getBorderColor(vehicleTo)} rounded-lg p-3 font-[OutfitR]`}
             placeholder="Destination"
             value={vehicleTo}
             onChangeText={setVehicleTo}
@@ -456,11 +464,11 @@ export default function VehicleInfoStep({ isVehicleA }) {
       <View style={tw`mb-6`}>
         <View style={tw`flex-row items-center mb-2`}>
           <FieldBubble number="10" />
-          <Text style={tw`text-lg font-[OutfitB] text-gray-800`}>Photos du véhicule</Text>
+          <Text style={[tw`text-lg font-[OutfitB] text-gray-800`,{fontFamily:'OutfitB'}]}>Photos du véhicule {isVehicleA ? 'A' : 'B'}</Text>
         </View>
         
-        <Text style={tw`text-gray-500 mb-3 font-[OutfitR] text-sm`}>
-          Ajoutez jusqu'à 6 photos du véhicule et des dommages
+        <Text style={[tw`text-gray-500 mb-3 font-[OutfitR] text-sm`,{fontFamily:'OutfitB'}]     }>
+          Ajoutez jusqu'à 8 photos du véhicule et des dommages
         </Text>
         
         {vehicleImages && vehicleImages.length > 0 ? (
@@ -482,7 +490,7 @@ export default function VehicleInfoStep({ isVehicleA }) {
                 </View>
               ))}
               
-              {vehicleImages.length < 6 && (
+              {vehicleImages.length < 8 && (
                 <View style={tw`w-[31%] h-24 mb-3 border-2 border-dashed border-gray-300 rounded-lg items-center justify-center`}>
                   <TouchableOpacity 
                     style={tw`items-center justify-center w-full h-full`}
@@ -495,7 +503,7 @@ export default function VehicleInfoStep({ isVehicleA }) {
               )}
             </View>
             
-            {vehicleImages.length < 6 && (
+            {vehicleImages.length < 8 && (
               <View style={tw`flex-row justify-center mt-2`}>
                 <TouchableOpacity 
                   style={tw`bg-[#0a7ea4] py-2 px-4 rounded-lg flex-row items-center mr-3`}
@@ -519,7 +527,7 @@ export default function VehicleInfoStep({ isVehicleA }) {
           <View style={tw`mb-4`}>
             <View style={tw`border-2 border-dashed border-gray-300 rounded-lg p-6 items-center justify-center bg-gray-50`}>
               <Ionicons name="images-outline" size={40} color="#0a7ea4" style={tw`mb-2`} />
-              <Text style={tw`text-gray-700 font-[OutfitM] mb-4 text-center`}>
+              <Text style={[tw`text-gray-700 font-[OutfitM] mb-4 text-center`,{fontFamily:'OutfitB'}]}>
                 Aucune photo ajoutée
               </Text>
               
@@ -529,7 +537,7 @@ export default function VehicleInfoStep({ isVehicleA }) {
                   onPress={takePhoto}
                 >
                   <Ionicons name="camera-outline" size={20} color="white" style={tw`mr-2`} />
-                  <Text style={tw`text-white font-[OutfitM]`}>Appareil photo</Text>
+                  <Text style={[tw`text-white font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Appareil photo</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
@@ -537,7 +545,7 @@ export default function VehicleInfoStep({ isVehicleA }) {
                   onPress={pickImage}
                 >
                   <Ionicons name="image-outline" size={20} color="#0a7ea4" style={tw`mr-2`} />
-                  <Text style={tw`text-[#0a7ea4] font-[OutfitM]`}>Galerie</Text>
+                  <Text style={[tw`text-[#0a7ea4] font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Galerie</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -546,11 +554,25 @@ export default function VehicleInfoStep({ isVehicleA }) {
         
         <View style={tw`flex-row items-center mt-1`}>
           <Ionicons name="information-circle-outline" size={16} color="gray" style={tw`mr-1`} />
-          <Text style={tw`text-gray-500 text-xs font-[OutfitR]`}>
-            {vehicleImages ? `${vehicleImages.length}/6 photos ajoutées` : "0/6 photos ajoutées"}
+          <Text style={[tw`text-gray-500 text-xs font-[OutfitR]`,{fontFamily:'OutfitB'}]}>
+            {vehicleImages ? `${vehicleImages.length}/8 photos ajoutées` : "0/8 photos ajoutées"}
           </Text>
         </View>
       </View>
+      
+      {/* Add a validation button at the bottom */}
+      <TouchableOpacity 
+        style={tw`bg-[#0a7ea4] py-3 rounded-lg mb-4`}
+        onPress={() => setShowValidation(true)}
+      >
+        <Text style={[tw`text-white font-[OutfitB] text-center`,{fontFamily:'OutfitB'}]}>Vérifier les champs obligatoires</Text>
+      </TouchableOpacity>
+      
+      {showValidation && (
+        <Text style={[tw`text-red-500 text-center mb-4 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>
+          Les champs en rouge sont obligatoires
+        </Text>
+      )}
     </ScrollView>
   );
 } 

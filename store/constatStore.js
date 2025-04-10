@@ -204,6 +204,14 @@ export const useConstatStore = create((set, get) => ({
   sketchImage: null,
   setSketchImage: (image) => set({ sketchImage: image }),
   
+  // Add sketch template information
+  sketchTemplate: null,
+  setSketchTemplate: (template) => set({ sketchTemplate: template }),
+  
+  // Add sketch paths for saving drawing state
+  sketchPaths: [],
+  setSketchPaths: (paths) => set({ sketchPaths: paths }),
+  
   // Add new state properties for insurance info
   vehicleAInsuranceInfo: null,
   vehicleBInsuranceInfo: null,
@@ -261,6 +269,58 @@ export const useConstatStore = create((set, get) => ({
   vehicleBImpactPoint: null,
   setVehicleBImpactPoint: (point) => set({ vehicleBImpactPoint: point }),
   
+  // Add these new state variables and setters to your constatStore
+  vehicleACircumstances: null,
+  setVehicleACircumstances: (circumstances) => set({ vehicleACircumstances: circumstances }),
+
+  vehicleBCircumstances: null,
+  setVehicleBCircumstances: (circumstances) => set({ vehicleBCircumstances: circumstances }),
+
+  // Insured person information (Section 8)
+  insuredAName: '',
+  setInsuredAName: (name) => set({ insuredAName: name }),
+
+  insuredAFirstName: '',
+  setInsuredAFirstName: (firstName) => set({ insuredAFirstName: firstName }),
+
+  insuredAAddress: '',
+  setInsuredAAddress: (address) => set({ insuredAAddress: address }),
+
+  insuredAPhone: '',
+  setInsuredAPhone: (phone) => set({ insuredAPhone: phone }),
+
+  // Vehicle B insured person
+  insuredBName: '',
+  setInsuredBName: (name) => set({ insuredBName: name }),
+
+  insuredBFirstName: '',
+  setInsuredBFirstName: (firstName) => set({ insuredBFirstName: firstName }),
+
+  insuredBAddress: '',
+  setInsuredBAddress: (address) => set({ insuredBAddress: address }),
+
+  insuredBPhone: '',
+  setInsuredBPhone: (phone) => set({ insuredBPhone: phone }),
+
+
+
+   // Add these new properties and setters
+   vehicleAImpactPoints: [],
+   vehicleBImpactPoints: [],
+   
+   setVehicleAImpactPoints: (points) => set({ vehicleAImpactPoints: points }),
+   setVehicleBImpactPoints: (points) => set({ vehicleBImpactPoints: points }),
+   
+
+    // New state for signatures
+  signatureA: null,
+  signatureB: null,
+  
+  // Functions to set signatures
+  setSignatureA: (signature) => set({ signatureA: signature }),
+  setSignatureB: (signature) => set({ signatureB: signature }),
+  
+
   // Reset all state
   resetState: () => set({
     vehicleCount: null,
@@ -273,9 +333,17 @@ export const useConstatStore = create((set, get) => ({
     witnesses: '',
     vehicleAImages: null,
     vehicleBImages: null,
+    sketchImage: null,
+    sketchTemplate: null,
+    sketchPaths: [],
     // Reset all other fields
     // ...
     vehicleAImpactPoint: null,
     vehicleBImpactPoint: null,
+    vehicleACircumstances: null,
+    vehicleBCircumstances: null,
+    signatureA: null,
+    signatureB: null,
+    
   })
-})); 
+}));

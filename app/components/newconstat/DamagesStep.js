@@ -14,9 +14,59 @@ export default function DamagesStep({ isVehicleA }) {
   const vehicleObservations = isVehicleA ? constatState.vehicleAObservations : constatState.vehicleBObservations;
   const setVehicleObservations = isVehicleA ? constatState.setVehicleAObservations : constatState.setVehicleBObservations;
   
-  // For impact point selection
-  const [impactPoint, setImpactPoint] = useState({ x: 0, y: 0 });
-  const [showImpactPoint, setShowImpactPoint] = useState(false);
+  // Get impact points from store or use local state if store functions don't exist
+  const [localImpactPoints, setLocalImpactPoints] = useState([]);
+  
+  // Use store values if they exist, otherwise use local state
+  const impactPoints = isVehicleA 
+    ? (constatState.vehicleAImpactPoints || localImpactPoints) 
+    : (constatState.vehicleBImpactPoints || localImpactPoints);
+  
+  // Try to use store setters if they exist, otherwise use local state
+  const setImpactPoints = (points) => {
+    // Always update local state
+    setLocalImpactPoints(points);
+    
+    // Try to update store if setters exist
+    if (isVehicleA && typeof constatState.setVehicleAImpactPoints === 'function') {
+      constatState.setVehicleAImpactPoints(points);
+    } else if (!isVehicleA && typeof constatState.setVehicleBImpactPoints === 'function') {
+      constatState.setVehicleBImpactPoints(points);
+    } else {
+      // Store setters don't exist, so we'll use a workaround
+      // Store the impact points in a field that does exist
+      const pointsJSON = JSON.stringify(points);
+      if (isVehicleA && typeof constatState.setVehicleAObservations === 'function') {
+        // Store a marker in observations that we can detect in ReviewStep
+        const currentObs = constatState.vehicleAObservations || '';
+        const marker = '[[IMPACT_POINTS:';
+        const markerEnd = ']]';
+        
+        // Remove any existing marker
+        let newObs = currentObs;
+        if (currentObs.includes(marker)) {
+          newObs = currentObs.replace(new RegExp(`${marker}.*?${markerEnd}`), '');
+        }
+        
+        // Add new marker with points data
+        newObs = `${newObs}\n${marker}${pointsJSON}${markerEnd}`;
+        constatState.setVehicleAObservations(newObs);
+      } else if (!isVehicleA && typeof constatState.setVehicleBObservations === 'function') {
+        // Same for vehicle B
+        const currentObs = constatState.vehicleBObservations || '';
+        const marker = '[[IMPACT_POINTS:';
+        const markerEnd = ']]';
+        
+        let newObs = currentObs;
+        if (currentObs.includes(marker)) {
+          newObs = currentObs.replace(new RegExp(`${marker}.*?${markerEnd}`), '');
+        }
+        
+        newObs = `${newObs}\n${marker}${pointsJSON}${markerEnd}`;
+        constatState.setVehicleBObservations(newObs);
+      }
+    }
+  };
   
   // Common types of vehicle damage
   const damageTypes = [
@@ -58,19 +108,27 @@ export default function DamagesStep({ isVehicleA }) {
   // Handle impact point selection on the car diagram
   const handleImagePress = (event) => {
     const { locationX, locationY } = event.nativeEvent;
-    setImpactPoint({ x: locationX, y: locationY });
-    setShowImpactPoint(true);
+    const newPoint = { x: locationX, y: locationY };
+    const newPoints = [...impactPoints, newPoint];
+    setImpactPoints(newPoints);
+  };
+  
+  // Remove an impact point
+  const removeImpactPoint = (index) => {
+    const newPoints = [...impactPoints];
+    newPoints.splice(index, 1);
+    setImpactPoints(newPoints);
   };
   
   const FieldBubble = ({ number }) => (
     <View style={tw`h-6 w-6 rounded-full bg-gray-700 items-center justify-center mr-2`}>
-      <Text style={tw`text-white font-[OutfitB] text-xs`}>{number}</Text>
+      <Text style={[tw`text-white font-[OutfitB] text-xs`,{fontFamily:'OutfitB'}]}>{number}</Text>
     </View>
   );
   
   return (
     <ScrollView style={tw`bg-white rounded-lg shadow-sm`} contentContainerStyle={tw`p-6`}>
-      <Text style={tw`text-xl font-[OutfitB] mb-6 text-center`}>
+      <Text style={[tw`text-xl font-[OutfitB] mb-6 text-center`,{fontFamily:'OutfitB'}]}>
         Dégâts apparents au véhicule {isVehicleA ? 'A' : 'B'}
       </Text>
       
@@ -78,11 +136,11 @@ export default function DamagesStep({ isVehicleA }) {
       <View style={tw`mb-6`}>
         <View style={tw`flex-row items-center mb-2`}>
           <FieldBubble number="10" />
-          <Text style={tw`text-lg font-[OutfitB] text-gray-800`}>Point de choc initial</Text>
+          <Text style={[tw`text-lg font-[OutfitB] text-gray-800`,{fontFamily:'OutfitB'}]}>Points de choc</Text>
         </View>
         
-        <Text style={tw`text-gray-500 mb-3 font-[OutfitR]`}>
-          Indiquer par une flèche le point de choc initial
+        <Text style={[tw`text-gray-500 mb-3 font-[OutfitR]`,{fontFamily:'OutfitB'}]}>
+          Touchez l'image pour indiquer les points de choc
         </Text>
         
         <View style={tw`relative`}>
@@ -94,22 +152,24 @@ export default function DamagesStep({ isVehicleA }) {
             />
           </TouchableOpacity>
           
-          {showImpactPoint && (
-            <View 
+          {impactPoints.map((point, index) => (
+            <TouchableOpacity 
+              key={index}
               style={[
                 tw`absolute items-center justify-center`,
-                { left: impactPoint.x - 14, top: impactPoint.y - 14 }
+                { left: point.x - 14, top: point.y - 14 }
               ]}
+              onPress={() => removeImpactPoint(index)}
             >
               <View style={tw`w-7 h-7 bg-red-500 rounded-full items-center justify-center`}>
                 <Ionicons name="close" size={20} color="white" />
               </View>
-            </View>
-          )}
+            </TouchableOpacity>
+          ))}
         </View>
         
-        <Text style={tw`text-gray-500 text-center mt-2 font-[OutfitR] text-sm`}>
-          Touchez l'image pour indiquer le point d'impact
+        <Text style={[tw`text-gray-500 text-center mt-2 font-[OutfitR] text-sm`,{fontFamily:'OutfitB'}]}>
+          Touchez l'image pour ajouter un point d'impact. Touchez un point pour le supprimer.
         </Text>
       </View>
       
@@ -117,7 +177,7 @@ export default function DamagesStep({ isVehicleA }) {
       <View style={tw`mb-6`}>
         <View style={tw`flex-row items-center mb-2`}>
           <FieldBubble number="11" />
-          <Text style={tw`text-lg font-[OutfitB] text-gray-800`}>Dégâts apparents</Text>
+          <Text style={[tw`text-lg font-[OutfitB] text-gray-800`,{fontFamily:'OutfitB'}]}>Dégâts apparents</Text>
         </View>
         
         <View style={tw`mt-2`}>
@@ -132,14 +192,14 @@ export default function DamagesStep({ isVehicleA }) {
                   <Ionicons name="checkmark" size={18} color="white" />
                 )}
               </View>
-              <Text style={tw`text-gray-800 font-[OutfitR] text-base`}>{damage.label}</Text>
+              <Text style={[tw`text-gray-800 font-[OutfitR] text-base`,{fontFamily:'OutfitB'}]}>{damage.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
         
         {selectedDamages.includes('other') && (
           <View style={tw`mt-4`}>
-            <Text style={tw`text-gray-700 font-[OutfitM] mb-2`}>Précisez les autres dommages :</Text>
+            <Text style={[tw`text-gray-700 font-[OutfitM] mb-2`,{fontFamily:'OutfitB'}]}>Précisez les autres dommages :</Text>
             <TextInput
               style={tw`border border-gray-300 rounded-lg p-3 h-24 font-[OutfitR]`}
               placeholder="Décrivez les autres dégâts visibles sur le véhicule"
@@ -158,11 +218,11 @@ export default function DamagesStep({ isVehicleA }) {
       <View style={tw`mb-4`}>
         <View style={tw`flex-row items-center mb-2`}>
           <FieldBubble number="14" />
-          <Text style={tw`text-lg font-[OutfitB] text-gray-800`}>Observations</Text>
+          <Text style={[tw`text-lg font-[OutfitB] text-gray-800`,{fontFamily:'OutfitB'}]  }>Observations</Text>
         </View>
         
         <TextInput
-          style={tw`border border-gray-300 rounded-lg p-3 h-24 font-[OutfitR]`}
+              style={[tw`border border-gray-300 rounded-lg p-3 h-24 font-[OutfitR]`,{fontFamily:'OutfitB'}]}
           placeholder="Observations supplémentaires"
           value={vehicleObservations}
           onChangeText={setVehicleObservations}

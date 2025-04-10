@@ -8,7 +8,7 @@ export default function VehicleCountStep() {
   
   return (
     <View style={tw`bg-white rounded-lg p-6 shadow-sm`}>
-      <Text style={tw`text-xl font-[OutfitB] mb-6 text-center`}>
+        <Text style={[tw`text-xl font-[OutfitB] mb-6 text-center`,{fontFamily:'OutfitB'}]}>
         Combien de véhicules sont impliqués?
       </Text>
       
@@ -20,7 +20,7 @@ export default function VehicleCountStep() {
           <View style={tw`bg-gray-100 rounded-full p-6 mb-2 ${vehicleCount === 1 ? 'border-2 border-[#0a7ea4]' : ''}`}>
       <Ionicons name="car" size={60} color="#0a7ea4" />
     </View>
-          <Text style={tw`text-lg font-[OutfitM] ${vehicleCount === 1 ? 'text-[#0a7ea4]' : 'text-gray-700'}`}>
+          <Text style={[tw`text-lg font-[OutfitM] ${vehicleCount === 1 ? 'text-[#0a7ea4]' : 'text-gray-700'}`,{fontFamily:'OutfitB'}]}>
             1 Véhicule
           </Text>
         </TouchableOpacity>
@@ -35,13 +35,13 @@ export default function VehicleCountStep() {
         <Ionicons name="car" size={50} color="#0a7ea4" style={tw`ml-2`} />
       </View>
     </View>
-          <Text style={tw`text-lg font-[OutfitM] ${vehicleCount === 2 ? 'text-[#0a7ea4]' : 'text-gray-700'}`}>
+          <Text style={[tw`text-lg font-[OutfitM] ${vehicleCount === 2 ? 'text-[#0a7ea4]' : 'text-gray-700'}`,{fontFamily:'OutfitB'}]}>
             2 Véhicules
           </Text>
         </TouchableOpacity>
       </View>
       
-      <Text style={tw`text-gray-500 text-center font-[OutfitR]`}>
+      <Text style={[tw`text-gray-500 text-center font-[OutfitR]`,{fontFamily:'OutfitB'}]  }>
         Sélectionnez le nombre de véhicules impliqués dans l'accident pour continuer.
       </Text>
     </View>

@@ -48,7 +48,7 @@ export default function AccidentInfoStep() {
   
   return (
     <ScrollView style={tw`bg-white rounded-lg p-6 shadow-sm`} showsVerticalScrollIndicator={false}>
-      <Text style={tw`text-xl font-[OutfitB] mb-6 text-center`}>
+      <Text style={[tw`text-xl font-[OutfitB] mb-6 text-center`,{fontFamily:'OutfitB'}] }>
         Informations sur l'accident
       </Text>
       
@@ -65,13 +65,13 @@ export default function AccidentInfoStep() {
       <View style={tw`mb-4`}>
         <View style={tw`flex-row items-center mb-1`}>
           <FieldBubble number="1" />
-          <Text style={tw`text-gray-700 font-[OutfitM]`}>Date de l'accident</Text>
+          <Text style={[tw`text-gray-700 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Date de l'accident</Text>
         </View>
         <TouchableOpacity 
           style={tw`border border-gray-300 rounded-lg p-3 flex-row justify-between items-center`}
           onPress={() => setShowDatePicker(true)}
         >
-          <Text style={tw`font-[OutfitR] ${accidentDate ? 'text-black' : 'text-gray-400'}`}>
+          <Text style={[tw`font-[OutfitR] ${accidentDate ? 'text-black' : 'text-gray-400'}`,{fontFamily:'OutfitB'}]}>
             {accidentDate || 'Sélectionner une date'}
           </Text>
           <Ionicons name="calendar-outline" size={20} color="#0a7ea4" />
@@ -89,13 +89,13 @@ export default function AccidentInfoStep() {
       <View style={tw`mb-4`}>
         <View style={tw`flex-row items-center mb-1`}>
           <FieldBubble number="1" />
-          <Text style={tw`text-gray-700 font-[OutfitM]`}>Heure de l'accident</Text>
+          <Text style={[tw`text-gray-700 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Heure de l'accident</Text>
         </View>
         <TouchableOpacity 
           style={tw`border border-gray-300 rounded-lg p-3 flex-row justify-between items-center`}
           onPress={() => setShowTimePicker(true)}
         >
-          <Text style={tw`font-[OutfitR] ${accidentTime ? 'text-black' : 'text-gray-400'}`}>
+          <Text style={[tw`font-[OutfitR] ${accidentTime ? 'text-black' : 'text-gray-400'}`,{fontFamily:'OutfitB'}] }>
             {accidentTime || 'Sélectionner une heure'}
           </Text>
           <Ionicons name="time-outline" size={20} color="#0a7ea4" />
@@ -113,7 +113,7 @@ export default function AccidentInfoStep() {
       <View style={tw`mb-4`}>
         <View style={tw`flex-row items-center mb-1`}>
           <FieldBubble number="2" />
-          <Text style={tw`text-gray-700 font-[OutfitM]`}>Lieu de l'accident</Text>
+          <Text style={[tw`text-gray-700 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Lieu de l'accident</Text>
         </View>
         <TextInput
           style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
@@ -126,7 +126,7 @@ export default function AccidentInfoStep() {
       <View style={tw`mb-4`}>
         <View style={tw`flex-row items-center mb-1`}>
           <FieldBubble number="3" />
-          <Text style={tw`text-gray-700 font-[OutfitM]`}>Blessés (même légers)</Text>
+          <Text style={[tw`text-gray-700 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Blessés (même légers)</Text>
         </View>
         <View style={tw`flex-row`}>
           <TouchableOpacity 
@@ -136,7 +136,7 @@ export default function AccidentInfoStep() {
             <View style={tw`h-5 w-5 rounded-full border border-gray-400 mr-2 ${hasInjuries === true ? 'bg-[#0a7ea4] border-[#0a7ea4]' : ''}`}>
               {hasInjuries === true && <Ionicons name="checkmark" size={16} color="white" />}
             </View>
-            <Text style={tw`font-[OutfitR]`}>Oui</Text>
+            <Text style={[tw`font-[OutfitR]`,{fontFamily:'OutfitB'}]}>Oui</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -146,7 +146,7 @@ export default function AccidentInfoStep() {
             <View style={tw`h-5 w-5 rounded-full border border-gray-400 mr-2 ${hasInjuries === false ? 'bg-[#0a7ea4] border-[#0a7ea4]' : ''}`}>
               {hasInjuries === false && <Ionicons name="checkmark" size={16} color="white" />}
             </View>
-            <Text style={tw`font-[OutfitR]`}>Non</Text>
+            <Text style={[tw`font-[OutfitR]`,{fontFamily:'OutfitB'}]}>Non</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -154,7 +154,7 @@ export default function AccidentInfoStep() {
       <View style={tw`mb-4`}>
         <View style={tw`flex-row items-center mb-1`}>
           <FieldBubble number="4" />
-          <Text style={tw`text-gray-700 font-[OutfitM]`}>Dégâts matériels autres qu'aux véhicules A et B</Text>
+          <Text style={[tw`text-gray-700 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Dégâts matériels autres qu'aux véhicules A et B</Text>
         </View>
         <View style={tw`flex-row`}>
           <TouchableOpacity 
@@ -164,7 +164,7 @@ export default function AccidentInfoStep() {
             <View style={tw`h-5 w-5 rounded-full border border-gray-400 mr-2 ${hasMaterialDamage === true ? 'bg-[#0a7ea4] border-[#0a7ea4]' : ''}`}>
               {hasMaterialDamage === true && <Ionicons name="checkmark" size={16} color="white" />}
             </View>
-            <Text style={tw`font-[OutfitR]`}>Oui</Text>
+            <Text style={[tw`font-[OutfitR]`,{fontFamily:'OutfitB'}]}>Oui</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -174,7 +174,7 @@ export default function AccidentInfoStep() {
             <View style={tw`h-5 w-5 rounded-full border border-gray-400 mr-2 ${hasMaterialDamage === false ? 'bg-[#0a7ea4] border-[#0a7ea4]' : ''}`}>
               {hasMaterialDamage === false && <Ionicons name="checkmark" size={16} color="white" />}
             </View>
-            <Text style={tw`font-[OutfitR]`}>Non</Text>
+            <Text style={[tw`font-[OutfitR]`,{fontFamily:'OutfitB'}]}>Non</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -182,7 +182,7 @@ export default function AccidentInfoStep() {
       <View style={tw`mb-4`}>
         <View style={tw`flex-row items-center mb-1`}>
           <FieldBubble number="5" />
-          <Text style={tw`text-gray-700 font-[OutfitM]`}>Témoins (noms, adresses, tél)</Text>
+          <Text style={[tw`text-gray-700 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Témoins (noms, adresses, tél)</Text>
         </View>
         <TextInput
           style={tw`border border-gray-300 rounded-lg p-3 h-24 font-[OutfitR]`}

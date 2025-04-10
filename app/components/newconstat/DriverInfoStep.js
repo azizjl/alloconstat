@@ -38,24 +38,24 @@ export default function DriverInfoStep({ isDriverA }) {
   
   const FieldBubble = ({ number }) => (
     <View style={tw`h-6 w-6 rounded-full bg-gray-700 items-center justify-center mr-2`}>
-      <Text style={tw`text-white font-[OutfitB] text-xs`}>{number}</Text>
+      <Text style={[tw`text-white font-[OutfitB] text-xs`,{fontFamily:'OutfitB'}]}>{number}</Text>
     </View>
   );
   
   return (
     <View style={tw`bg-white rounded-lg p-6 shadow-sm`}>
-      <Text style={tw`text-xl font-[OutfitB] mb-6 text-center`}>
+      <Text style={[tw`text-xl font-[OutfitB] mb-6 text-center`,{fontFamily:'OutfitB'}]}>
         Conducteur du Véhicule {isDriverA ? 'A' : 'B'}
       </Text>
       
       <View style={tw`mb-6 border-b border-gray-200 pb-4`}>
         <View style={tw`flex-row items-center mb-2`}>
           <FieldBubble number="7" />
-          <Text style={tw`text-lg font-[OutfitB] text-gray-800`}>Identité du Conducteur</Text>
+          <Text style={[tw`text-lg font-[OutfitB] text-gray-800`,{fontFamily:'OutfitB'}]}>Identité du Conducteur</Text>
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Nom</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Nom</Text>
           <TextInput
             style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
             placeholder="Nom de famille"
@@ -65,7 +65,7 @@ export default function DriverInfoStep({ isDriverA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Prénom</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Prénom</Text>
           <TextInput
             style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
             placeholder="Prénom"
@@ -75,7 +75,7 @@ export default function DriverInfoStep({ isDriverA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Adresse</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Adresse</Text>
           <TextInput
             style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
             placeholder="Adresse complète"
@@ -85,7 +85,7 @@ export default function DriverInfoStep({ isDriverA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Téléphone</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Téléphone</Text>
           <TextInput
             style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
             placeholder="Numéro de téléphone"
@@ -96,7 +96,7 @@ export default function DriverInfoStep({ isDriverA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Permis de conduire N°</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]     }>Permis de conduire N°</Text>
           <TextInput
             style={tw`border border-gray-300 rounded-lg p-3 font-[OutfitR]`}
             placeholder="Numéro de permis"
@@ -106,12 +106,12 @@ export default function DriverInfoStep({ isDriverA }) {
         </View>
         
         <View style={tw`mb-4`}>
-          <Text style={tw`text-gray-700 mb-1 font-[OutfitM]`}>Délivré le</Text>
+          <Text style={[tw`text-gray-700 mb-1 font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Délivré le</Text>
           <TouchableOpacity 
             style={tw`border border-gray-300 rounded-lg p-3 flex-row justify-between items-center`}
             onPress={() => setShowDatePicker(true)}
           >
-            <Text style={tw`font-[OutfitR] ${driverLicenseDate ? 'text-black' : 'text-gray-400'}`}>
+            <Text style={[tw`font-[OutfitR] ${driverLicenseDate ? 'text-black' : 'text-gray-400'}`,{fontFamily:'OutfitB'}]  }>
               {driverLicenseDate || 'Sélectionner une date'}
             </Text>
             <Ionicons name="calendar-outline" size={20} color="#0a7ea4" />

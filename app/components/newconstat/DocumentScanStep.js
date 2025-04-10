@@ -120,8 +120,8 @@ const [loading, setLoading] = useState(false);
   const renderDocumentSection = (title, description, documentType, image) => {
     return (
       <View style={tw`mb-6`}>
-        <Text style={tw`text-lg font-[OutfitM] mb-2`}>{title}</Text>
-        <Text style={tw`text-gray-500 mb-4 font-[OutfitR]`}>{description}</Text>
+        <Text style={[tw`text-lg font-[OutfitM] mb-2`,{fontFamily:'OutfitB'}]}>{title}</Text>
+        <Text style={[tw`text-gray-500 mb-4 font-[OutfitR]`,{fontFamily:'OutfitB'}]}>{description}</Text>
         
         {image ? (
           <View style={tw`mb-4`}>
@@ -158,7 +158,7 @@ const [loading, setLoading] = useState(false);
               onPress={() => takePhoto(documentType)}
             >
               <Ionicons name="camera-outline" size={20} color="white" style={tw`mr-2`} />
-              <Text style={tw`text-white font-[OutfitM]`}>Prendre une photo</Text>
+                <Text style={[tw`text-white font-[OutfitM]`,{fontFamily:'OutfitB'}]}>Prendre une photo</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
@@ -166,7 +166,7 @@ const [loading, setLoading] = useState(false);
               onPress={() => pickImage(documentType)}
             >
               <Ionicons name="image-outline" size={20} color="#0a7ea4" style={tw`mr-2`} />
-              <Text style={tw`text-[#0a7ea4] font-[OutfitM]`}>Galerie</Text>
+              <Text style={[tw`text-[#0a7ea4] font-[OutfitM]`,{fontFamily:'OutfitB'}]   }>Galerie</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -659,11 +659,11 @@ const [loading, setLoading] = useState(false);
   
   return (
     <ScrollView style={tw`bg-white rounded-lg p-6 shadow-sm`} showsVerticalScrollIndicator={false}>
-      <Text style={tw`text-xl font-[OutfitB] mb-6 text-center`}>
+      <Text style={[tw`text-xl font-[OutfitB] mb-6 text-center`,{fontFamily:'OutfitB'}]}>
         Documents du Véhicule {vehicle}
       </Text>
       
-      <Text style={tw`text-gray-600 mb-6 font-[OutfitR]`}>
+      <Text style={[tw`text-gray-600 mb-6 font-[OutfitR]`,{fontFamily:'OutfitB'}]}>
         Prenez en photo ou téléchargez les documents suivants pour extraire automatiquement les informations.
       </Text>
       
@@ -697,13 +697,13 @@ const [loading, setLoading] = useState(false);
           <ActivityIndicator color="white" />
         ) : (
           <>
-            <Text style={tw`text-white font-[OutfitM] text-lg`}>Traiter les documents</Text>
+            <Text style={[tw`text-white font-[OutfitM] text-lg`,{fontFamily:'OutfitB'}]}>Traiter les documents</Text>
             <Ionicons name="scan-outline" size={20} color="white" style={tw`ml-2`} />
           </>
         )}
       </TouchableOpacity>
       
-      <Text style={tw`text-gray-500 text-center mt-4 font-[OutfitR]`}>
+      <Text style={[tw`text-gray-500 text-center mt-4 font-[OutfitR]`,{fontFamily:'OutfitB'}]}>
         Vous pouvez également passer cette étape et saisir les informations manuellement.
       </Text>
     </ScrollView>

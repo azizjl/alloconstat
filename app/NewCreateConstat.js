@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import tw from 'twrnc';
 import { useState, useCallback } from 'react';
@@ -15,8 +15,10 @@ import AccidentInfoStep from './components/newconstat/AccidentInfoStep';
 import VehicleInfoStep from './components/newconstat/VehicleInfoStep';
 import DriverInfoStep from './components/newconstat/DriverInfoStep';
 import DamagesStep from './components/newconstat/DamagesStep';
+import CircumstancesStep from './components/newconstat/CircumstancesStep';
 import SketchStep from './components/newconstat/SketchStep';
 import ReviewStep from './components/newconstat/ReviewStep';
+import FinalStep from './components/newconstat/FinalStep';
 import { useConstatStore } from '../store/constatStore';
 
 export default function NewCreateConstat() {
@@ -25,6 +27,7 @@ export default function NewCreateConstat() {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [processingDocuments, setProcessingDocuments] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   
   // Process documents with Google Vision API
   const processDocuments = async (vehicle) => {
@@ -133,96 +136,12 @@ export default function NewCreateConstat() {
   };
   
   const handleSubmit = async () => {
-    if (!constatState.title.trim()) {
-      Alert.alert('Erreur', 'Veuillez entrer un titre pour ce constat');
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      
-      // Upload all images
-      const uploadPromises = [];
-      let uploadResults = {};
-      
-      // Vehicle A images
-      if (constatState.vehicleAImage) {
-        uploadPromises.push(
-          uploadImage(constatState.vehicleAImage, `${user.id}/${Date.now()}-vehicleA.jpg`)
-            .then(path => { uploadResults.vehicleAImagePath = path; })
-        );
-      }
-      
-      if (constatState.vehicleAIdCard) {
-        uploadPromises.push(
-          uploadImage(constatState.vehicleAIdCard, `${user.id}/${Date.now()}-vehicleA-id.jpg`)
-            .then(path => { uploadResults.vehicleAIdCardPath = path; })
-        );
-      }
-      
-      // Add other image uploads similarly
-      // ...
-      
-      // Wait for all uploads to complete
-      await Promise.all(uploadPromises);
-      
-      const { data, error } = await supabase
-        .from('constats')
-        .insert([
-          { 
-            title: constatState.title, 
-            accident_date: constatState.accidentDate,
-            accident_time: constatState.accidentTime,
-            accident_location: constatState.accidentLocation,
-            has_injuries: constatState.hasInjuries,
-            has_material_damage: constatState.hasMaterialDamage,
-            witnesses: constatState.witnesses,
-            vehicle_count: constatState.vehicleCount,
-            
-            // Vehicle A
-            vehicle_a_make: constatState.vehicleAMake,
-            vehicle_a_model: constatState.vehicleAModel,
-            vehicle_a_plate: constatState.vehicleAPlate,
-            vehicle_a_insurance: constatState.vehicleAInsurance,
-            vehicle_a_insurance_policy: constatState.vehicleAInsurancePolicy,
-            vehicle_a_agency: constatState.vehicleAAgency,
-            vehicle_a_certificate_valid_from: constatState.vehicleACertificateValidFrom,
-            vehicle_a_certificate_valid_to: constatState.vehicleACertificateValidTo,
-            vehicle_a_damages: constatState.vehicleADamages,
-            vehicle_a_direction: constatState.vehicleADirection,
-            vehicle_a_from: constatState.vehicleAFrom,
-            vehicle_a_to: constatState.vehicleATo,
-            vehicle_a_observations: constatState.vehicleAObservations,
-            vehicle_a_image: uploadResults.vehicleAImagePath,
-            vehicle_a_id_card: uploadResults.vehicleAIdCardPath,
-            vehicle_a_registration: uploadResults.vehicleARegistrationPath,
-            vehicle_a_insurance_card: uploadResults.vehicleAInsuranceCardPath,
-            
-            // Driver A
-            driver_a_name: constatState.driverAName,
-            driver_a_first_name: constatState.driverAFirstName,
-            driver_a_address: constatState.driverAAddress,
-            driver_a_phone: constatState.driverAPhone,
-            driver_a_license: constatState.driverALicense,
-            driver_a_license_date: constatState.driverALicenseDate,
-            
-            // Add Vehicle B and Driver B data similarly
-            // ...
-            
-            user_id: user.id 
-          }
-        ])
-        .select();
-        
-      if (error) throw error;
-      
-      Alert.alert('Succès', 'Constat créé avec succès');
-      router.back();
-    } catch (error) {
-      Alert.alert('Erreur lors de la création du constat', error.message);
-    } finally {
-      setLoading(false);
-    }
+    // This function is now only used for the final "Return to Home" button
+    router.back();
+  };
+  
+  const handleSubmissionComplete = () => {
+    setIsSubmitted(true);
   };
   
   const nextStep = () => {
@@ -231,7 +150,7 @@ export default function NewCreateConstat() {
       return;
     }
     
-    const maxStep = constatState.vehicleCount === 1 ? 7 : 9;
+    const maxStep = constatState.vehicleCount === 1 ? 9 : 12;
     
     if (currentStep < maxStep) {
       setCurrentStep(currentStep + 1);
@@ -247,7 +166,7 @@ export default function NewCreateConstat() {
   };
   
   const renderStepIndicator = () => {
-    const maxSteps = constatState.vehicleCount === 1 ? 7 : 9;
+    const maxSteps = constatState.vehicleCount === 1 ? 9 : 12;
     
     return (
       <View style={tw`flex-row justify-center my-4`}>
@@ -261,11 +180,85 @@ export default function NewCreateConstat() {
     );
   };
   
+  // Render the thank you page after submission
+  const renderThankYouPage = () => {
+    return (
+      <ScrollView style={tw`flex-1 p-6`}>
+        <View style={tw`items-center mb-8 mt-4`}>
+          <Ionicons name="checkmark-circle" size={80} color="#4CAF50" />
+          <Text style={tw`text-2xl font-[OutfitB] text-center mt-4 text-gray-800`}>
+            Merci pour votre soumission!
+          </Text>
+        </View>
+        
+        <Text style={tw`text-lg font-[OutfitM] text-center mb-6 text-gray-700`}>
+          Votre constat a été enregistré avec succès. Un de nos agents vous contactera prochainement pour le suivi.
+        </Text>
+        
+        <Text style={tw`text-base font-[OutfitM] mb-8 text-gray-600`}>
+          En attendant, veuillez rester en sécurité et prendre toutes les précautions nécessaires. Si vous avez besoin d'assistance immédiate, vous pouvez contacter les services d'urgence ci-dessous.
+        </Text>
+        
+        <View style={tw`mb-8`}>
+          <Text style={tw`text-lg font-[OutfitB] mb-4 text-gray-800`}>
+            Services d'urgence
+          </Text>
+          
+          <TouchableOpacity
+            style={tw`bg-red-500 py-3 px-5 rounded-lg flex-row items-center mb-4`}
+            onPress={() => Linking.openURL('tel:190')}
+          >
+            <Ionicons name="call" size={20} color="white" style={tw`mr-2`} />
+            <Text style={tw`text-white font-[OutfitM]`}>Police (190)</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={tw`bg-red-500 py-3 px-5 rounded-lg flex-row items-center mb-4`}
+            onPress={() => Linking.openURL('tel:198')}
+          >
+            <Ionicons name="medkit" size={20} color="white" style={tw`mr-2`} />
+            <Text style={tw`text-white font-[OutfitM]`}>Ambulance (198)</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={tw`bg-red-500 py-3 px-5 rounded-lg flex-row items-center mb-4`}
+            onPress={() => Linking.openURL('tel:197')}
+          >
+            <Ionicons name="flame" size={20} color="white" style={tw`mr-2`} />
+            <Text style={tw`text-white font-[OutfitM]`}>Pompiers (197)</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={tw`bg-[#0a7ea4] py-3 px-5 rounded-lg flex-row items-center mb-4`}
+            onPress={() => Linking.openURL('tel:+21671000000')} // Replace with your company's number
+          >
+            <Ionicons name="car" size={20} color="white" style={tw`mr-2`} />
+            <Text style={tw`text-white font-[OutfitM]`}>Assistance routière</Text>
+          </TouchableOpacity>
+        </View>
+        
+        <TouchableOpacity
+          style={tw`bg-green-600 py-3 px-5 rounded-lg flex-row items-center justify-center mb-8`}
+          onPress={handleSubmit}
+        >
+          <Ionicons name="home" size={20} color="white" style={tw`mr-2`} />
+          <Text style={tw`text-white font-[OutfitM]`}>Retour à l'accueil</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    );
+  };
+  
   const renderCurrentStep = () => {
+    if (isSubmitted) {
+      return renderThankYouPage();
+    }
+    
     switch (currentStep) {
       case 1:
         return <VehicleCountStep />;
       case 2:
+        return <AccidentInfoStep />;
+      case 3:
         return (
           <DocumentScanStep 
             vehicle="A"
@@ -273,13 +266,13 @@ export default function NewCreateConstat() {
             processing={processingDocuments}
           />
         );
-      case 3:
-        return <AccidentInfoStep />;
       case 4:
         return <VehicleInfoStep isVehicleA={true} />;
       case 5:
+        return <DamagesStep isVehicleA={true} />;
+      case 6:
         if (constatState.vehicleCount === 1) {
-          return <DamagesStep isVehicleA={true} />;
+          return <CircumstancesStep isVehicleA={true} />;
         }
         return (
           <DocumentScanStep 
@@ -288,20 +281,27 @@ export default function NewCreateConstat() {
             processing={processingDocuments}
           />
         );
-      case 6:
+      case 7:
         if (constatState.vehicleCount === 1) {
           return <SketchStep />;
         }
         return <VehicleInfoStep isVehicleA={false} />;
-      case 7:
+      case 8:
         if (constatState.vehicleCount === 1) {
           return <ReviewStep />;
         }
         return <DamagesStep isVehicleA={false} />;
-      case 8:
-        return <SketchStep />;
       case 9:
+        if (constatState.vehicleCount === 1) {
+          return <FinalStep onSubmissionComplete={handleSubmissionComplete} />;
+        }
+        return <CircumstancesStep isVehicleA={false} />;
+      case 10:
+        return <SketchStep />;
+      case 11:
         return <ReviewStep />;
+      case 12:
+        return <FinalStep onSubmissionComplete={handleSubmissionComplete} />;
       default:
         return null;
     }
@@ -310,53 +310,59 @@ export default function NewCreateConstat() {
   return (
     <SafeAreaView style={tw`flex-1 bg-gray-50`}>
       <View style={tw`flex-row items-center p-4 border-b border-gray-200 bg-white`}>
-        <TouchableOpacity onPress={prevStep}>
-          <Ionicons name="arrow-back" size={24} color="#0a7ea4" />
-        </TouchableOpacity>
-        <Text style={tw`flex-1 text-center text-lg font-[OutfitB] text-gray-800`}>Nouveau Constat</Text>
+        {!isSubmitted && (
+          <TouchableOpacity onPress={prevStep}>
+            <Ionicons name="arrow-back" size={24} color="#0a7ea4" />
+          </TouchableOpacity>
+        )}
+        <Text style={[tw`flex-1 text-center text-lg text-gray-800`,{fontFamily:'OutfitB'}]}>
+          {isSubmitted ? "Confirmation" : "Nouveau Constat"}
+        </Text>
         <View style={tw`w-6`}></View>
       </View>
       
-      {renderStepIndicator()}
+      {!isSubmitted && renderStepIndicator()}
       
       <View style={tw`flex-1 px-4`} showsVerticalScrollIndicator={false}>
         {renderCurrentStep()}
-        {/* <View style={tw`h-24`}></View> */}
       </View>
       
-      <View style={tw`p-4 bg-white border-t border-gray-200`}>
-        {(currentStep === 7 && constatState.vehicleCount === 1) || (currentStep === 9 && constatState.vehicleCount === 2) ? (
-          <TouchableOpacity 
-            style={tw`bg-[#0a7ea4] p-4 rounded-full flex-row justify-center items-center`}
-            onPress={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <>
-                <Text style={tw`text-white font-[OutfitM] text-lg`}>Enregistrer</Text>
-                <Ionicons name="checkmark" size={20} color="white" style={tw`ml-2`} />
-              </>
-            )}
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity 
-            style={tw`bg-[#0a7ea4] p-4 rounded-full flex-row justify-center items-center`}
-            onPress={nextStep}
-            disabled={processingDocuments}
-          >
-            {processingDocuments ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <>
-                <Text style={tw`text-white font-[OutfitM] text-lg`}>Suivant</Text>
-                <Ionicons name="arrow-forward" size={20} color="white" style={tw`ml-2`} />
-              </>
-            )}
-          </TouchableOpacity>
-        )}
-      </View>
+      {!isSubmitted && (
+        <View style={tw`p-4 bg-white border-t border-gray-200`}>
+          {((currentStep === 9 && constatState.vehicleCount === 1) || (currentStep === 12 && constatState.vehicleCount === 2)) ? (
+            <TouchableOpacity 
+              style={tw`bg-[#0a7ea4] p-4 rounded-full flex-row justify-center items-center opacity-50`}
+              disabled={true}
+            >
+              <Text style={[tw`text-white font-[OutfitM] text-lg`,{fontFamily:'OutfitB'}]}>Enregistrer</Text>
+              <Ionicons name="checkmark" size={20} color="white" style={tw`ml-2`} />
+            </TouchableOpacity>
+          ) : ((currentStep === 8 && constatState.vehicleCount === 1) || (currentStep === 11 && constatState.vehicleCount === 2)) ? (
+            <TouchableOpacity 
+              style={tw`bg-[#0a7ea4] p-4 rounded-full flex-row justify-center items-center`}
+              onPress={nextStep}
+            >
+              <Text style={[tw`text-white font-[OutfitM] text-lg`,{fontFamily:'OutfitB'}]}>Continuer vers la signature</Text>
+              <Ionicons name="arrow-forward" size={20} color="white" style={tw`ml-2`} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity 
+              style={tw`bg-[#0a7ea4] p-4 rounded-full flex-row justify-center items-center`}
+              onPress={nextStep}
+              disabled={processingDocuments}
+            >
+              {processingDocuments ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <>
+                  <Text style={[tw`text-white font-[OutfitM] text-lg`,{fontFamily:'OutfitB'}]}>Suivant</Text>
+                  <Ionicons name="arrow-forward" size={20} color="white" style={tw`ml-2`} />
+                </>
+              )}
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
     </SafeAreaView>
   );
-} 
+}
